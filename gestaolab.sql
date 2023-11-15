@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 23-Jun-2023 às 18:22
+-- Tempo de geração: 15-Nov-2023 às 14:12
 -- Versão do servidor: 10.4.28-MariaDB
 -- versão do PHP: 8.2.4
 
@@ -60,6 +60,18 @@ CREATE TABLE `horarios_uso` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura da tabela `laboratorios`
+--
+
+CREATE TABLE `laboratorios` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(180) NOT NULL,
+  `responsavel` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura da tabela `materiais`
 --
 
@@ -69,28 +81,17 @@ CREATE TABLE `materiais` (
   `marca` varchar(25) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'Sem marca',
   `modelo` varchar(25) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'Sem modelo',
   `tipo_material` varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `estado` enum('Danificado','Bom','Rasoável') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Bom',
+  `estado` enum('danificado','bom','rasoavel') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'bom',
   `data_compra` date NOT NULL,
   `capacidade` varchar(70) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT 'Não definido',
   `tem_programas` enum('Sim','Não','Não definido') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Não definido',
   `mesa` int(11) NOT NULL,
+  `laboratorio` int(11) NOT NULL,
   `username` int(11) NOT NULL,
   `CreateAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `UpdateAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `observacoes` text CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Extraindo dados da tabela `materiais`
---
-
-INSERT INTO `materiais` (`id`, `nome`, `marca`, `modelo`, `tipo_material`, `estado`, `data_compra`, `capacidade`, `tem_programas`, `mesa`, `username`, `CreateAt`, `UpdateAt`, `observacoes`) VALUES
-(1, 'Meu Material Novo', 'Sem marca', 'Sem modelo', 'key', 'Rasoável', '1899-11-27', 'Não definido', 'Não', 1, 0, '2023-06-19 23:59:14', '2023-06-19 23:59:14', 'Mouse com problemas'),
-(9, 'PC para Gestao', 'HP', 'HP Pavillon', 'pc', 'Bom', '2023-06-15', 'Win10 Pro, RAM 4GB, 1TB, i5-345, 2,5Hz', 'Não', 11, 0, '2023-06-21 17:46:44', '2023-06-21 17:46:44', 'Meu novo comentario'),
-(11, 'Meu Material Novo', 'Sem marca', 'Sem modelo', 'pc', 'Rasoável', '2023-06-23', 'Ram de 4GB, HD 250GB, Intel 2,5GHz', 'Sim', 1, 0, '2023-06-21 18:04:22', '2023-06-21 18:04:22', ''),
-(13, 'Meu Material Novo', 'Sem marca', 'Sem modelo', 'pc', 'Danificado', '2023-06-30', 'Ram de 4GB, HD 250GB, Intel 2,5GHz', 'Sim', 1, 0, '2023-06-21 18:09:34', '2023-06-21 18:09:34', ''),
-(22, 'kalueka2', 'Sem marca', 'Sem modelo', 'oth', 'Bom', '0000-00-00', 'Não definido', 'Não definido', 1, 0, '2023-06-21 23:34:16', '2023-06-21 23:34:16', ''),
-(23, 'Mais um registo', 'Sem marca', 'Sem modelo', 'mo', 'Bom', '2023-06-16', 'Não definido', 'Não definido', 1, 0, '2023-06-22 00:35:33', '2023-06-22 00:35:33', '');
 
 -- --------------------------------------------------------
 
@@ -113,9 +114,10 @@ CREATE TABLE `mesas` (
 
 INSERT INTO `mesas` (`id`, `nome`, `num_maximo_pc`, `CreateAt`, `UpdateAt`, `estado`) VALUES
 (1, 'Mesa 1', 0, '2023-06-15 23:00:00', '2023-06-15 23:00:00', 'Espaço Livre'),
-(11, 'Mesa do Kalueka', 0, '2023-06-20 13:28:35', '2023-06-20 13:28:35', 'Vazia'),
-(15, 'Nova Mesa', 0, '2023-06-23 15:36:24', '2023-06-23 15:36:24', 'Espaço Livre'),
-(16, 'Mesa 2', 2, '2023-06-23 16:12:43', '2023-06-23 15:45:51', 'Espaço Livre');
+(11, 'Mesa do Formador', 1, '2023-11-03 10:50:34', '2023-06-20 13:28:35', 'Cheia'),
+(15, 'Mesa 1 do CFTU Cyber', 5, '2023-11-03 10:51:05', '2023-06-23 15:36:24', 'Cheia'),
+(16, 'Mesa 2', 2, '2023-06-23 16:12:43', '2023-06-23 15:45:51', 'Espaço Livre'),
+(17, 'jacinto', 10, '2023-11-05 14:29:54', '2023-11-05 14:29:54', 'Cheia');
 
 -- --------------------------------------------------------
 
@@ -193,8 +195,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nome_completo`, `bi`, `genero`, `username`, `password`, `tipo_conta`, `estado`) VALUES
-(1, 'Pedro Manuel Kalueka', '00000000000000', 'Masculino', 'admin', '$2a$10$qeoDOVjznDCr3fj6zOa/Y.A52x1AheBpB8DoeGXnmej5JTZjGbScO', 'administrador', 'Activo'),
-(3, 'Carlos Manuel', '008771113UE045', 'Masculino', 'carlos', '$2a$10$OIzcXvOHrMsXDwR8SH1LlOoGD23OJD5Mmeidh4nKwMyXezo8EUgwC', 'convidado', 'Activo');
+(4, 'Tiago Pedro Menenga Bondo', '00000000000011', 'Masculino', 'tiago1', '$2a$10$WJCQ/zDd2B3aT/soSkfI2uqPYyxlF98r263NCzdLadHzV6DL3J.nK', 'administrador', 'Activo'),
+(5, 'Manuel Kalueka DEV', '020464029UE059', 'Masculino', 'admin', '$2a$10$z/yxhc9SdMdu3xmm0/Bt1ep/51vJzhY.AJdjoaNMutd2zNIAqrkJ2', 'administrador', 'Activo');
 
 --
 -- Índices para tabelas despejadas
@@ -213,12 +215,20 @@ ALTER TABLE `horarios_uso`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Índices para tabela `laboratorios`
+--
+ALTER TABLE `laboratorios`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `laboratorios_ibfk_1` (`responsavel`);
+
+--
 -- Índices para tabela `materiais`
 --
 ALTER TABLE `materiais`
   ADD PRIMARY KEY (`id`),
   ADD KEY `tipo_material` (`tipo_material`),
-  ADD KEY `mesa` (`mesa`);
+  ADD KEY `mesa` (`mesa`),
+  ADD KEY `laboratorio` (`laboratorio`);
 
 --
 -- Índices para tabela `mesas`
@@ -269,16 +279,22 @@ ALTER TABLE `horarios_uso`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de tabela `laboratorios`
+--
+ALTER TABLE `laboratorios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `materiais`
 --
 ALTER TABLE `materiais`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `mesas`
 --
 ALTER TABLE `mesas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de tabela `perdidos_achados`
@@ -296,16 +312,23 @@ ALTER TABLE `relatorios`
 -- AUTO_INCREMENT de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Restrições para despejos de tabelas
 --
 
 --
+-- Limitadores para a tabela `laboratorios`
+--
+ALTER TABLE `laboratorios`
+  ADD CONSTRAINT `laboratorios_ibfk_1` FOREIGN KEY (`responsavel`) REFERENCES `usuarios` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
 -- Limitadores para a tabela `materiais`
 --
 ALTER TABLE `materiais`
+  ADD CONSTRAINT `laboratorio` FOREIGN KEY (`laboratorio`) REFERENCES `laboratorios` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `mesa` FOREIGN KEY (`mesa`) REFERENCES `mesas` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `tipo_material` FOREIGN KEY (`tipo_material`) REFERENCES `tipos_materiais` (`codigo_tipo_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
