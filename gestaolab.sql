@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 15-Nov-2023 às 14:12
+-- Tempo de geração: 17-Nov-2023 às 00:06
 -- Versão do servidor: 10.4.28-MariaDB
 -- versão do PHP: 8.2.4
 
@@ -66,8 +66,18 @@ CREATE TABLE `horarios_uso` (
 CREATE TABLE `laboratorios` (
   `id` int(11) NOT NULL,
   `nome` varchar(180) NOT NULL,
+  `descricao` varchar(180) NOT NULL,
   `responsavel` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `laboratorios`
+--
+
+INSERT INTO `laboratorios` (`id`, `nome`, `descricao`, `responsavel`) VALUES
+(1, 'Laboratório de CISCO', 'Este Lab faz muitas coisas , bastante mesmo', 5),
+(2, 'Laboratório do Kalueka', 'Este Lab faz muitas coisas , bastante mesmo', 5),
+(3, 'Meu novo Lab', 'Meus Lab, ninguem encomoda', 4);
 
 -- --------------------------------------------------------
 
@@ -93,6 +103,13 @@ CREATE TABLE `materiais` (
   `observacoes` text CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `materiais`
+--
+
+INSERT INTO `materiais` (`id`, `nome`, `marca`, `modelo`, `tipo_material`, `estado`, `data_compra`, `capacidade`, `tem_programas`, `mesa`, `laboratorio`, `username`, `CreateAt`, `UpdateAt`, `observacoes`) VALUES
+(3, 'material com laboratório ', 'Sem marca', 'Sem modelo', 'key', 'bom', '0000-00-00', 'Não definido', 'Não definido', 18, 2, 0, '2023-11-16 21:20:43', '2023-11-16 21:20:43', '');
+
 -- --------------------------------------------------------
 
 --
@@ -105,19 +122,22 @@ CREATE TABLE `mesas` (
   `num_maximo_pc` int(11) NOT NULL,
   `CreateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `UpdateAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `estado` enum('Cheia','Vazia','Espaço Livre') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Espaço Livre'
+  `estado` enum('Cheia','Vazia','Espaço Livre') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Espaço Livre',
+  `laboratorio` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `mesas`
 --
 
-INSERT INTO `mesas` (`id`, `nome`, `num_maximo_pc`, `CreateAt`, `UpdateAt`, `estado`) VALUES
-(1, 'Mesa 1', 0, '2023-06-15 23:00:00', '2023-06-15 23:00:00', 'Espaço Livre'),
-(11, 'Mesa do Formador', 1, '2023-11-03 10:50:34', '2023-06-20 13:28:35', 'Cheia'),
-(15, 'Mesa 1 do CFTU Cyber', 5, '2023-11-03 10:51:05', '2023-06-23 15:36:24', 'Cheia'),
-(16, 'Mesa 2', 2, '2023-06-23 16:12:43', '2023-06-23 15:45:51', 'Espaço Livre'),
-(17, 'jacinto', 10, '2023-11-05 14:29:54', '2023-11-05 14:29:54', 'Cheia');
+INSERT INTO `mesas` (`id`, `nome`, `num_maximo_pc`, `CreateAt`, `UpdateAt`, `estado`, `laboratorio`) VALUES
+(1, 'Mesa 1', 0, '2023-11-16 21:06:29', '2023-06-15 23:00:00', 'Espaço Livre', 1),
+(11, 'Mesa do Formador', 1, '2023-11-03 10:50:34', '2023-06-20 13:28:35', 'Cheia', 0),
+(15, 'Mesa 1 do CFTU Cyber', 5, '2023-11-03 10:51:05', '2023-06-23 15:36:24', 'Cheia', 0),
+(16, 'Mesa 2', 2, '2023-06-23 16:12:43', '2023-06-23 15:45:51', 'Espaço Livre', 0),
+(17, 'jacinto', 10, '2023-11-05 14:29:54', '2023-11-05 14:29:54', 'Cheia', 0),
+(18, 'Mesa com Laboratório ', 12, '2023-11-16 21:20:07', '2023-11-16 21:20:07', 'Espaço Livre', 2),
+(19, 'Kalueka', 12, '2023-11-16 22:52:28', '2023-11-16 22:52:28', 'Espaço Livre', 3);
 
 -- --------------------------------------------------------
 
@@ -234,7 +254,8 @@ ALTER TABLE `materiais`
 -- Índices para tabela `mesas`
 --
 ALTER TABLE `mesas`
-  ADD PRIMARY KEY (`id`) USING BTREE;
+  ADD PRIMARY KEY (`id`) USING BTREE,
+  ADD KEY `lab_fk` (`laboratorio`);
 
 --
 -- Índices para tabela `perdidos_achados`
@@ -282,19 +303,19 @@ ALTER TABLE `horarios_uso`
 -- AUTO_INCREMENT de tabela `laboratorios`
 --
 ALTER TABLE `laboratorios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `materiais`
 --
 ALTER TABLE `materiais`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `mesas`
 --
 ALTER TABLE `mesas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de tabela `perdidos_achados`
@@ -331,6 +352,12 @@ ALTER TABLE `materiais`
   ADD CONSTRAINT `laboratorio` FOREIGN KEY (`laboratorio`) REFERENCES `laboratorios` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `mesa` FOREIGN KEY (`mesa`) REFERENCES `mesas` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `tipo_material` FOREIGN KEY (`tipo_material`) REFERENCES `tipos_materiais` (`codigo_tipo_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Limitadores para a tabela `mesas`
+--
+ALTER TABLE `mesas`
+  ADD CONSTRAINT `lab_fk` FOREIGN KEY (`laboratorio`) REFERENCES `laboratorios` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Limitadores para a tabela `perdidos_achados`
